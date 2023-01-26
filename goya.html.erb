@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  </head>
+  <body>
+    <h1>課題</h1>
+
+    <% require 'pg' %>
+
+    <% connection = PG::connect(dbname: "goya") %>
+    <% connection.internal_encoding = "UTF-8" %>
+
+    <% result = connection.exec("select * from crops where not(give_for='自家消費') ;") %>
+    <% data = [] %>
+
+    <% result.each do |record| %>
+      <%  data << "売った相手：#{record["give_for"]}" %>
+    <% end %>
+    <form action="goya.cgi" method="POST">
+      <input type="text" name="goya" value="<%= data.join(' ') %>">
+      <input type="submit" name="送信" >
+    </form>
+
+
+    <% connection = PG::connect(dbname: "goya") %>
+    <% connection.internal_encoding = "UTF-8" %>
+
+    <% result = connection.exec("select * from crops where quality='false';") %>
+    <% data = [] %>
+
+    <% result.each do |record| %>
+      <%  data << "不良品のゴーヤ：#{record["quality"]} ゴーヤの大きさ：#{record["weight"]}" %>
+    <% end %>
+    <form action="indicate.cgi" method="POST">
+      <input type="text" name="goya" value="<%= data.join(' ') %>">
+      <input type="submit" name="送信" >
+    </form>
+    
+  </body>
+</html>
+  </body>
+</html>
